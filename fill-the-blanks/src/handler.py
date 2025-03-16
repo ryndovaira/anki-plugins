@@ -30,7 +30,6 @@ currentLocation = os.path.dirname(os.path.realpath(__file__))
 
 
 class FieldsContext:
-    ignore_case = False
     currentFirst = None
     entry_number = 0
     answers: list = list()
@@ -176,13 +175,31 @@ def handle_answer(answer: str, card, phase: str) -> str:
 
 
 def _format_field_result(given: str, expected: str) -> BeautifulSoup:
+    """
+    Compares the given answer with the expected one and returns formatted HTML.
+
+    - If case-insensitive comparison is enabled, both answers are converted to lowercase.
+    - If the answers match, the correct answer is marked with a green highlight.
+    - If they do not match, the incorrect answer is crossed out, and the expected answer is displayed.
+    """
     given = given.strip()
     expected = expected.strip()
-    match_ignore_case = FieldsContext.ignore_case and given.lower() == expected.lower()
-    if given == expected or match_ignore_case:
+
+    # Read the case sensitivity setting from the config
+    ignore_case = ConfigService.read(ConfigKey.IGNORE_CASE, bool)
+
+    # Convert both answers to lowercase if case insensitivity is enabled
+    if ignore_case:
+        given = given.lower()
+        expected = expected.lower()
+
+    # If answers match, mark as correct
+    if given == expected:
         return BeautifulSoup(
             "<span class='cloze st-ok'>%s</span>" % html.escape(expected), "html.parser"
         )
+
+    # If answers do not match, highlight the mistake
     return BeautifulSoup(
         "<del class='cloze st-error'>%s</del><ins class='cloze st-expected'>%s</ins>"
         % (html.escape(given), html.escape(expected)),

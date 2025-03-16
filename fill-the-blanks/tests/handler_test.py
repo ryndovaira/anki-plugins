@@ -1,15 +1,22 @@
 import pytest
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src')
 
-from handler import FieldsContext, AnkiInterface, addon_field_filter, handle_answer, _format_field_result
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../src")
+
+from handler import (
+    FieldsContext,
+    AnkiInterface,
+    addon_field_filter,
+    handle_answer,
+    _format_field_result,
+)
 from anki_mocks_test import TestReviewer, TestCard
 
 AnkiInterface.strip_HTML = lambda i: i
 
-class FilterContext:
 
+class FilterContext:
     def __init__(self, c_ord: int):
         self._card = TestCard()
         self._card.ord = c_ord - 1
@@ -40,7 +47,7 @@ def test_filter():
 
     print(res)
     assert 'id="ansval0" type="hidden" value="fields"' in res
-    assert 'typeans0' in res
+    assert "typeans0" in res
 
 
 def test_filter2():
@@ -65,7 +72,7 @@ This is a <span class="cloze" data-ordinal="1">test</span>&nbsp;<br>With some to
 
     assert 'id="ansval0" type="hidden" value="test"' in res
     assert 'id="ansval1" type="hidden" value="same"' in res
-    assert 'ansval2' not in res
+    assert "ansval2" not in res
 
 
 def test_filter_with_hint():
@@ -108,6 +115,7 @@ A value in the back field upd field upd
 
     assert '<span class="cloze st-ok">double</span>' in res
 
+
 def test_answer_wrong():
     content = """
 <style>.card {
@@ -137,7 +145,9 @@ A value in the back field upd field upd
     assert "st-expected" in res
     assert "st-error" in res
 
+
 # --------------------------------- From previous version - tests --------------------------------------------
+
 
 def test_nocloze():
     data = """
@@ -149,8 +159,8 @@ def test_nocloze():
 
     res = addon_field_filter(data, "Text", "fill-blanks", FilterContext(2))
 
-    assert ('Single value' in res)
-    assert 'ansval0' not in res
+    assert "Single value" in res
+    assert "ansval0" not in res
 
 
 def test_with_quotes():
@@ -165,7 +175,10 @@ def test_with_quotes():
 
     print(res)
 
-    assert """<input id="ansval0" type="hidden" value="one(&quot;q&quot;, 'step')"/>""" in res
+    assert (
+        """<input id="ansval0" type="hidden" value="one(&quot;q&quot;, 'step')"/>"""
+        in res
+    )
 
 
 def test_withRegexStr():
@@ -181,15 +194,14 @@ def test_withRegexStr():
 
 
 def test_field_result_uppercase_error():
-    result = _format_field_result('milano', 'Milano')
-    assert 'st-error' in str(result)
+    result = _format_field_result("milano", "Milano")
+    assert "st-error" in str(result)
 
 
 def test_field_result_ignore_case():
-    FieldsContext.ignore_case = True
-    result = _format_field_result('milano', 'Milano')
-    assert 'st-error' not in str(result)
-    assert 'st-ok' in str(result)
+    result = _format_field_result("milano", "Milano")
+    assert "st-error" not in str(result)
+    assert "st-ok" in str(result)
 
 
 def test_multiple_with_hint():
@@ -201,6 +213,6 @@ an> <span class="cloze-inactive" data-ordinal="2">Sprache</span> After
     res = addon_field_filter(data, "Text", "fill-blanks", FilterContext(1))
 
     print(res)
-    assert ('typeans0' in res)
+    assert "typeans0" in res
     assert 'placeholder="Pro..."' in res
-    assert ('mit' in res)
+    assert "mit" in res
