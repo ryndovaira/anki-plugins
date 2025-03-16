@@ -15,7 +15,13 @@ currentLocation = os.path.dirname(os.path.realpath(__file__))
 
 # ---------------------------------- Model ------------------------------
 
+
 class ConfigKey:
+    FEEDBACK_ENABLED = "feedback-enabled"
+    IGNORE_CASE = "feedback-ignore-case"
+    IGNORE_ACCENTS = "feedback-ignore-accents"
+    ASIAN_CHARS = "experimental-asian-chars"
+    LEN_MULTIPLIER = "input-len-times"
 
 
 # ------------------------------ Service class --------------------------
@@ -26,13 +32,15 @@ DEFAULT_CONFIG = {
     ConfigKey.IGNORE_CASE: True,
     ConfigKey.IGNORE_ACCENTS: False,
     ConfigKey.ASIAN_CHARS: False,
+    ConfigKey.LEN_MULTIPLIER: 62,
 }
+
 
 class ConfigService:
     """
-        Responsible for reading and storing configurations
+    Responsible for reading and storing configurations
     """
-    
+
     @staticmethod
     def load_config(key):
         raise NotImplementedError()

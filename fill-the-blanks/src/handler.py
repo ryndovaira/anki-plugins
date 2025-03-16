@@ -11,11 +11,12 @@ from typing import Optional
 
 from bs4 import BeautifulSoup
 import html
+from .config import ConfigService, ConfigKey
 
 
 class AnkiInterface:
     """
-        Decouples internal components from Anki, making it easier for unit testing
+    Decouples internal components from Anki, making it easier for unit testing
     """
 
     staticReviewer = None
@@ -49,7 +50,7 @@ def addon_field_filter(field_text: str, field_name: str, filter_name: str, ctx) 
 
     # print("card ord: %d" % rev_card.ord)
 
-    body = BeautifulSoup(field_text, 'html.parser')
+    body = BeautifulSoup(field_text, "html.parser")
 
     typein_fields = _traverse_entries(body, rev_card)
     FieldsContext.entry_number = typein_fields
@@ -62,19 +63,21 @@ def addon_field_filter(field_text: str, field_name: str, filter_name: str, ctx) 
 
 def _traverse_entries(body, rev_card) -> int:
     typein_fields = 0
-    for idx, span in enumerate(body.find_all('span', 'cloze')):
-        tag_ordinal = span['data-ordinal'] if span.has_attr('data-ordinal') else "-1"
+    for idx, span in enumerate(body.find_all("span", "cloze")):
+        tag_ordinal = span["data-ordinal"] if span.has_attr("data-ordinal") else "-1"
         if tag_ordinal != str(rev_card.ord + 1):
             continue
 
-        cloze_value = span['data-cloze'] if span.has_attr('data-cloze') else span.text
+        cloze_value = span["data-cloze"] if span.has_attr("data-cloze") else span.text
         remaining_text = span.text
         span.replace_with(_apply_typein_value(cloze_value, remaining_text, idx))
         typein_fields += 1
     return typein_fields
 
 
-def _apply_typein_value(cloze_value: str, extra_text: Optional[str], field_idx: int) -> BeautifulSoup:
+def _apply_typein_value(
+    cloze_value: str, extra_text: Optional[str], field_idx: int
+) -> BeautifulSoup:
     clean_value = _clear_correct_value_as_reviewer(cloze_value)
     has_hint = extra_text and extra_text != cloze_value and extra_text != "[...]"
     hint = extra_text.removeprefix("[").removesuffix("]") if has_hint else ""
@@ -92,7 +95,7 @@ def _clear_correct_value_as_reviewer(text_beautiful_soup: str):
     cor = re.sub("(\n|<br ?/?>|</?div>)+", " ", cor)
     cor = cor.replace("&nbsp;", " ")
     cor = cor.replace("\xa0", " ")
-    cor = cor.replace('"', '&quot;')
+    cor = cor.replace('"', "&quot;")
 
     # Remove zero-width space that might be used between double-colons as a
     # hack to support double-colon content within cloze deletion (prevent
@@ -104,14 +107,25 @@ def _clear_correct_value_as_reviewer(text_beautiful_soup: str):
 
 
 def _create_fill_elements(idx: int, text: str, hint: str = "") -> BeautifulSoup:
-    hidden = BeautifulSoup("""<input type="hidden" id="ansval%d" value="%s" />""" % (idx, text), "html.parser")
-    typein = BeautifulSoup("""<input type="text" id="typeans%d" placeholder="%s" class="ftb %s" />""" %
-                           (idx, hint, _get_length_class(text, hint)), "html.parser")
-    script = BeautifulSoup(
-        """<script type="text/javascript">setUpFillBlankListener($('#ansval%d').val(), %d)</script>""" % (idx, idx),
-        'html.parser')
+    hidden = BeautifulSoup(
+        """<input type="hidden" id="ansval%d" value="%s" />""" % (idx, text),
+        "html.parser",
+    )
+    typein = BeautifulSoup(
+        """<input type="text" id="typeans%d" placeholder="%s" class="ftb" style="%s" />"""
+        % (idx, hint, _get_input_length(text, hint)),
+        "html.parser",
+    )
 
-    container_soup = BeautifulSoup("""<span class="ftb-container"></span>""", "html.parser")
+    script = BeautifulSoup(
+        """<script type="text/javascript">setUpFillBlankListener($('#ansval%d').val(), %d)</script>"""
+        % (idx, idx),
+        "html.parser",
+    )
+
+    container_soup = BeautifulSoup(
+        """<span class="ftb-container"></span>""", "html.parser"
+    )
     container = container_soup.span
 
     container.append(hidden)
@@ -121,16 +135,11 @@ def _create_fill_elements(idx: int, text: str, hint: str = "") -> BeautifulSoup:
     return container
 
 
-def _get_length_class(text: str, hint: str):
+def _get_input_length(text: str, hint: str):
+    length_multiplier = ConfigService.read(ConfigKey.LEN_MULTIPLIER, int)
     hint_present = hint if hint else ""
-    size = max(len(text), len(hint_present))
-    if size <= 5:
-        return "ftb-xs"
-    elif size <= 10:
-        return "ftb-sm"
-    elif size > 20:
-        return "ftb-lg"
-    return "ftb-md"
+    size = max(len(text), len(hint_present)) * (0.01 * length_multiplier)
+    return f"width: {size}em;"  # Генерируем CSS-стиль для ширины поля
 
 
 def on_show_question():
@@ -146,13 +155,14 @@ def on_show_question():
 
 # --------------------------------- Handle answer ----------------------------------------
 
+
 def handle_answer(answer: str, card, phase: str) -> str:
     if phase != "reviewAnswer":
         return answer
 
-    soup = BeautifulSoup(answer, 'html.parser')
+    soup = BeautifulSoup(answer, "html.parser")
     field_ctx = None if FieldsContext.entry_number == 0 else FieldsContext
-    span_list = soup.find_all('span', 'cloze')
+    span_list = soup.find_all("span", "cloze")
 
     if not field_ctx or (len(span_list) != len(field_ctx.answers)):
         return answer
@@ -170,16 +180,22 @@ def _format_field_result(given: str, expected: str) -> BeautifulSoup:
     expected = expected.strip()
     match_ignore_case = FieldsContext.ignore_case and given.lower() == expected.lower()
     if given == expected or match_ignore_case:
-        return BeautifulSoup("<span class='cloze st-ok'>%s</span>" % html.escape(expected), "html.parser")
-    return BeautifulSoup("<del class='cloze st-error'>%s</del><ins class='cloze st-expected'>%s</ins>" %
-                         (html.escape(given), html.escape(expected)),
-                         "html.parser")
+        return BeautifulSoup(
+            "<span class='cloze st-ok'>%s</span>" % html.escape(expected), "html.parser"
+        )
+    return BeautifulSoup(
+        "<del class='cloze st-error'>%s</del><ins class='cloze st-expected'>%s</ins>"
+        % (html.escape(given), html.escape(expected)),
+        "html.parser",
+    )
 
 
 def getTypedAnswer(_old):
     reviewer = AnkiInterface.staticReviewer
     if FieldsContext.entry_number > 0:
-        reviewer.web.evalWithCallback("typedWords ? typedWords : []", _onFillBlankAnswer)
+        reviewer.web.evalWithCallback(
+            "typedWords ? typedWords : []", _onFillBlankAnswer
+        )
     return _old(reviewer)
 
 
@@ -188,4 +204,3 @@ def _onFillBlankAnswer(val) -> None:
     if FieldsContext.entry_number > 0:
         FieldsContext.answers = val
     reviewer._showAnswer()
-
