@@ -66,9 +66,9 @@ Especially for those who disable _instant feedback_, on "Show answer" the add-on
 
 ## Bugs / Suggestions / more...
 
-Please, feel free to make suggestions and open issues about possible bugs found.  
+Please, feel free to make suggestions and open issues about possible bugs found.
 
-That and the source code are available on: [Github](https://github.com/ssricardo/anki-plugins/tree/master/fill-the-blanks)
+Source code and issues: [GitHub](https://github.com/ryndovaira/anki-plugins/tree/master/fill-the-blanks)
 
 ## Updates
 
@@ -76,11 +76,5 @@ That and the source code are available on: [Github](https://github.com/ssricardo
 
 ## About
 
-Add-on developed by *ssricardo*.  
-Check out more of my add-ons on [Github Anki Plugins](https://github.com/ssricardo/anki-plugins)
-
-### Buy me a coffee
-
-> If you feel like...
-
-https://www.buymeacoffee.com/ricardoss
+Originally developed by [ssricardo](https://github.com/ssricardo/anki-plugins).
+Currently maintained by [ryndovaira](https://github.com/ryndovaira/anki-plugins).
