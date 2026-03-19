@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
 # Class responsible for the processing
 #
 # This file is part of fill-the-blanks addon
 # @author ricardo saturnino
-# -------------------------------------------------------
 
-import os
 import re
 from typing import Optional
 
@@ -14,10 +11,9 @@ import html
 
 from .config import ConfigService, ConfigKey
 
+
 class AnkiInterface:
-    """
-        Decouples internal components from Anki, making it easier for unit testing
-    """
+    """Decouples internal components from Anki, making it easier for unit testing."""
 
     staticReviewer = None
 
@@ -26,19 +22,13 @@ class AnkiInterface:
         raise NotImplementedError("Must be replaced")
 
 
-currentLocation = os.path.dirname(os.path.realpath(__file__))
-
-
 class FieldsContext:
     currentFirst = None
     entry_number = 0
-    answers: list = list()
+    answers: list = []
 
 
 def addon_field_filter(field_text: str, field_name: str, filter_name: str, ctx) -> str:
-    # print("**** Field filter: %s on field %s" % (filter_name, field_name))
-    # print(field_text)
-
     if filter_name != "fill-blanks":
         return field_text
 
@@ -46,9 +36,6 @@ def addon_field_filter(field_text: str, field_name: str, filter_name: str, ctx) 
     FieldsContext.answers.clear()
 
     rev_card = ctx.card()
-
-    # print("card ord: %d" % rev_card.ord)
-
     body = BeautifulSoup(field_text, 'html.parser')
 
     typein_fields = _traverse_entries(body, rev_card)
@@ -85,9 +72,7 @@ def _apply_typein_value(cloze_value: str, extra_text: Optional[str], field_idx: 
 
 
 def _clear_correct_value_as_reviewer(text_beautiful_soup: str):
-    """Mostly copy from original reviewer code *as plain text*"""
-
-    # cor = self._mw.col.media.strip(valueAsBeautifulSoupText)      TODO
+    """Mostly copy from original reviewer code *as plain text*."""
     cor: str = AnkiInterface.strip_HTML(text_beautiful_soup)
     cor = re.sub("(\n|<br ?/?>|</?div>)+", " ", cor)
     cor = cor.replace("&nbsp;", " ")

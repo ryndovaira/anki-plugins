@@ -1,6 +1,9 @@
 import pytest
 
-from src.handler import FieldsContext, AnkiInterface, addon_field_filter, handle_answer, _format_field_result
+from src.handler import (
+    FieldsContext, AnkiInterface, addon_field_filter, handle_answer,
+    _format_field_result, _get_length_class, _clear_correct_value_as_reviewer,
+)
 from src.config import ConfigService, ConfigKey
 from tests.anki_mocks_test import TestReviewer, TestCard
 
@@ -207,3 +210,123 @@ an> <span class="cloze-inactive" data-ordinal="2">Sprache</span> After
     assert ('typeans0' in res)
     assert 'placeholder="Pro..."' in res
     assert ('mit' in res)
+
+
+# --------------------------------- _get_length_class tests ------------------------------------------
+
+def test_length_class_xs():
+    assert _get_length_class("hi", "") == "ftb-xs"
+
+def test_length_class_sm():
+    assert _get_length_class("hello!", "") == "ftb-sm"
+
+def test_length_class_md():
+    assert _get_length_class("medium length", "") == "ftb-md"
+
+def test_length_class_lg():
+    assert _get_length_class("a very long answer indeed!", "") == "ftb-lg"
+
+def test_length_class_uses_hint_if_longer():
+    assert _get_length_class("ab", "a longer hint here") == "ftb-md"
+
+
+# --------------------------------- _clear_correct_value tests ---------------------------------------
+
+def test_clear_value_strips_br():
+    result = _clear_correct_value_as_reviewer("hello<br>world")
+    assert result == "hello world"
+
+def test_clear_value_strips_nbsp():
+    result = _clear_correct_value_as_reviewer("hello&nbsp;world")
+    assert result == "hello world"
+
+def test_clear_value_escapes_quotes():
+    result = _clear_correct_value_as_reviewer('say "hi"')
+    assert result == "say &quot;hi&quot;"
+
+def test_clear_value_strips_zero_width_space():
+    result = _clear_correct_value_as_reviewer("a\u200bb")
+    assert result == "ab"
+
+def test_clear_value_strips_whitespace():
+    result = _clear_correct_value_as_reviewer("  hello  ")
+    assert result == "hello"
+
+
+# --------------------------------- _format_field_result edge cases ----------------------------------
+
+def test_field_result_strips_whitespace():
+    result = _format_field_result("  hello  ", "  hello  ")
+    assert 'st-ok' in str(result)
+
+def test_field_result_empty_strings():
+    result = _format_field_result("", "")
+    assert 'st-ok' in str(result)
+
+def test_field_result_html_escaped():
+    result = _format_field_result("<script>", "expected")
+    assert '<script>' not in str(result)
+    assert '&lt;script&gt;' in str(result)
+
+def test_field_result_ignore_case_shows_original_expected():
+    _orig = ConfigService.load_config
+    ConfigService.load_config = lambda key: True if key == ConfigKey.IGNORE_CASE else _orig(key)
+    try:
+        result = str(_format_field_result("HELLO", "Hello"))
+        assert 'st-ok' in result
+        assert 'Hello' in result
+    finally:
+        ConfigService.load_config = _orig
+
+def test_field_result_ignore_case_mismatch():
+    _orig = ConfigService.load_config
+    ConfigService.load_config = lambda key: True if key == ConfigKey.IGNORE_CASE else _orig(key)
+    try:
+        result = str(_format_field_result("wrong", "Right"))
+        assert 'st-error' in result
+        assert 'Right' in result
+        assert 'wrong' in result
+    finally:
+        ConfigService.load_config = _orig
+
+
+# --------------------------------- handle_answer edge cases ----------------------------------------
+
+def test_handle_answer_wrong_phase():
+    res = handle_answer("<p>test</p>", TestCard(), "reviewQuestion")
+    assert res == "<p>test</p>"
+
+def test_handle_answer_no_fields():
+    FieldsContext.entry_number = 0
+    res = handle_answer('<span class="cloze">word</span>', TestCard(), "reviewAnswer")
+    assert 'word' in res
+    assert 'st-ok' not in res
+
+def test_handle_answer_mismatched_spans():
+    FieldsContext.entry_number = 1
+    FieldsContext.answers = ["one", "two"]
+    content = '<span class="cloze">only-one</span>'
+    res = handle_answer(content, TestCard(), "reviewAnswer")
+    assert 'st-ok' not in res
+    assert 'st-error' not in res
+
+
+# --------------------------------- FieldsContext state tests ----------------------------------------
+
+def test_fields_context_reset_on_filter():
+    FieldsContext.entry_number = 99
+    FieldsContext.answers = ["leftover"]
+
+    data = '<span class="cloze" data-ordinal="1">[...]</span>'
+    addon_field_filter(data, "Text", "fill-blanks", FilterContext(1))
+
+    assert FieldsContext.answers == []
+
+def test_fields_context_no_filter_preserves_state():
+    FieldsContext.entry_number = 5
+    FieldsContext.answers = ["preserved"]
+
+    addon_field_filter("no cloze here", "Text", "other-filter", FilterContext(1))
+
+    assert FieldsContext.entry_number == 5
+    assert FieldsContext.answers == ["preserved"]

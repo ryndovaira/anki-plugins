@@ -2,10 +2,10 @@ let ifEnabled = true;
 let shouldIgnoreCase = false;
 let shouldIgnoreAccents = false;
 let asianCharsEnabled = false;
-var typedWords = [];
+let typedWords = [];
 
 function checkFieldValue(reference, fieldIndex, event) {
-    if (window.event.keyCode === 13) {
+    if (event.key === 'Enter') {
         pycmd("ans");
         return;
     }
@@ -17,7 +17,6 @@ function checkFieldValue(reference, fieldIndex, event) {
     }
 
     let current = field.val();
-    // console.log('Cur: ' + current + '; starts? ' + reference.startsWith(current));
     let previous = field.data('lastValue');
 
     if (suggestNextCharacter(field, current, reference, event)) {
@@ -137,7 +136,7 @@ function setUpFillBlankListener(expected, typeAnsIndex) {
     // add extra event for Enter key
     if (eventType === "input") {
         document.getElementById(`typeans${typeAnsIndex}`).addEventListener("keyup", (evt) => {
-            if (window.event.keyCode === 13) {
+            if (event.key === 'Enter') {
                 pycmd("ans");
             }
         })

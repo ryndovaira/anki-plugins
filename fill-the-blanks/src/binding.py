@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
 # Handles the main integration (bindings) with Anki
 #
-# This files is part of fill-the-blanks addon
+# This file is part of fill-the-blanks addon
 # @author ricardo saturnino
-# -------------------------------------------------------
-
-instance = None
 
 import os
 
@@ -24,12 +20,12 @@ CWD = os.path.dirname(os.path.realpath(__file__))
 
 CSS_STYLE = """
 <style type="text/css">
-input.ftb {    
+input.ftb {
     border-radius: 5px;
-    border: 1px solid;
+    border: 1px solid #999;
     min-width: 50px;
     max-width: 400px;
-    padding: 3px;    
+    padding: 3px;
     margin: 2px;
 }
 input.ftb-md {
@@ -62,9 +58,9 @@ input.st-ok {
 </style>
 """
 
-_handler = None
-JS_LOCATION = CWD + '/fill-blanks.js'
+JS_LOCATION = os.path.join(CWD, 'fill-blanks.js')
 _warn_template_shown = False
+
 
 def _ankiConfigRead(key):
     return mw.addonManager.getConfig(__name__)[key]
@@ -73,7 +69,8 @@ def _ankiConfigRead(key):
 def warn_template_editor(*args):
     global _warn_template_shown
     if not _warn_template_shown:
-        tooltip("[Fill-in-the-blanks] Be aware: The add-on does not apply to the template editor. To check it, please go to Review mode", 9000)
+        tooltip("[Fill-in-the-blanks] Be aware: The add-on does not apply to the template editor. "
+                "To check it, please go to Review mode", 9000)
         _warn_template_shown = True
 
 
@@ -89,10 +86,8 @@ def wrapInitWeb(anki_mw, fn):
 
         anki_mw.reviewer.web.eval(addStylesJs)
 
-        f = open(JS_LOCATION, 'r')
-        anki_mw.reviewer.web.eval("""
-                %s
-            """ % f.read())
+        with open(JS_LOCATION, 'r') as f:
+            anki_mw.reviewer.web.eval(f.read())
 
         if not ConfigService.read(ConfigKey.FEEDBACK_ENABLED, bool):
             anki_mw.reviewer.web.eval('disableInstantFb();')
@@ -104,7 +99,6 @@ def wrapInitWeb(anki_mw, fn):
             anki_mw.reviewer.web.eval('ignoreAccentsOnFeedback();')
 
         if ConfigService.read(ConfigKey.ASIAN_CHARS, bool):
-            print('Enabling experimental Asian Chars mode')
             anki_mw.reviewer.web.eval('enableAsianChars();')
 
     return _initReviewerWeb
@@ -125,7 +119,6 @@ def _setup_anki_integration():
 
 
 def run():
-    # tooltip('Loading fill-the-blanks Handler')
     ConfigService.load_config = _ankiConfigRead
 
     reviewer = mw.reviewer
