@@ -13,7 +13,7 @@ class ConfigKey:
 
 DEFAULT_CONFIG = {
     ConfigKey.FEEDBACK_ENABLED: True,
-    ConfigKey.IGNORE_CASE: False,
+    ConfigKey.IGNORE_CASE: True,
     ConfigKey.IGNORE_ACCENTS: False,
     ConfigKey.ASIAN_CHARS: False,
 }

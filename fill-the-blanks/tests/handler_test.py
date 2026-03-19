@@ -182,8 +182,13 @@ def test_withRegexStr():
 
 
 def test_field_result_uppercase_error():
-    result = _format_field_result('milano', 'Milano')
-    assert 'st-case-error' in str(result)
+    _orig = ConfigService.load_config
+    ConfigService.load_config = lambda key: False if key == ConfigKey.IGNORE_CASE else _orig(key)
+    try:
+        result = _format_field_result('milano', 'Milano')
+        assert 'st-case-error' in str(result)
+    finally:
+        ConfigService.load_config = _orig
 
 
 def test_field_result_ignore_case():
@@ -306,9 +311,14 @@ def test_classify_real_error():
     assert _classify_error("abc", "xyz") == 'st-error'
 
 def test_field_result_case_error_in_answer():
-    result = str(_format_field_result("hello", "Hello"))
-    assert 'st-case-error' in result
-    assert 'st-expected' in result
+    _orig = ConfigService.load_config
+    ConfigService.load_config = lambda key: False if key == ConfigKey.IGNORE_CASE else _orig(key)
+    try:
+        result = str(_format_field_result("hello", "Hello"))
+        assert 'st-case-error' in result
+        assert 'st-expected' in result
+    finally:
+        ConfigService.load_config = _orig
 
 def test_field_result_punctuation_error_in_answer():
     result = str(_format_field_result("hello world", "hello, world"))

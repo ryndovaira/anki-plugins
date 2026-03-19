@@ -37,7 +37,7 @@ input.st-case-error {
     color: #333;
 }
 input.st-punctuation-error {
-    background-color: #e8a838;
+    background-color: #FFB841;
     color: #333;
 }
 input.st-error {
@@ -58,7 +58,7 @@ input.st-ok {
     text-decoration: line-through;
 }
 .cloze.st-punctuation-error {
-    color: #d48a20;
+    color: #FFB841;
     text-decoration: line-through;
 }
 .cloze.st-expected {
