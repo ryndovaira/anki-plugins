@@ -145,6 +145,21 @@ def handle_answer(answer: str, card, phase: str) -> str:
     return str(soup)
 
 
+_PUNCTUATION_RE = re.compile(r'[\s\W]+', re.UNICODE)
+
+
+def _strip_punctuation(text: str) -> str:
+    return _PUNCTUATION_RE.sub('', text)
+
+
+def _classify_error(given: str, expected: str) -> str:
+    if given.lower() == expected.lower():
+        return 'st-case-error'
+    if _strip_punctuation(given).lower() == _strip_punctuation(expected).lower():
+        return 'st-punctuation-error'
+    return 'st-error'
+
+
 def _format_field_result(given: str, expected: str) -> BeautifulSoup:
     given = given.strip()
     expected = expected.strip()
@@ -152,8 +167,9 @@ def _format_field_result(given: str, expected: str) -> BeautifulSoup:
     matches = given.lower() == expected.lower() if ignore_case else given == expected
     if matches:
         return BeautifulSoup("<span class='cloze st-ok'>%s</span>" % html.escape(expected), "html.parser")
-    return BeautifulSoup("<del class='cloze st-error'>%s</del><ins class='cloze st-expected'>%s</ins>" %
-                         (html.escape(given), html.escape(expected)),
+    error_class = _classify_error(given, expected)
+    return BeautifulSoup("<del class='cloze %s'>%s</del><ins class='cloze st-expected'>%s</ins>" %
+                         (error_class, html.escape(given), html.escape(expected)),
                          "html.parser")
 
 

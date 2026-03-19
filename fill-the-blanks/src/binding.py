@@ -32,6 +32,14 @@ input.st-incomplete {
     background-color: #FFFF77;
     color: #333;
 }
+input.st-case-error {
+    background-color: #a8d8ea;
+    color: #333;
+}
+input.st-punctuation-error {
+    background-color: #e8a838;
+    color: #333;
+}
 input.st-error {
     background-color: #ff9999;
     color: #333;
@@ -43,6 +51,14 @@ input.st-ok {
 
 .cloze.st-error {
     color: #ff4949;
+    text-decoration: line-through;
+}
+.cloze.st-case-error {
+    color: #5ba3c9;
+    text-decoration: line-through;
+}
+.cloze.st-punctuation-error {
+    color: #d48a20;
     text-decoration: line-through;
 }
 .cloze.st-expected {

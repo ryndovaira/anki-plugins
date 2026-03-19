@@ -48,10 +48,10 @@ function checkFieldValue(reference, fieldIndex, event) {
     if (current == reference) {
         field.addClass('st-ok');
     } else {
-        if (reference.startsWith(current)) {            
+        if (reference.startsWith(current)) {
             field.addClass('st-incomplete');
         } else {
-            field.addClass('st-error');
+            field.addClass(classifyError(current, reference));
         }
     }
     field.data('lastValue', current);
@@ -59,9 +59,24 @@ function checkFieldValue(reference, fieldIndex, event) {
 }
 
 function cleanUpView(field) {
-    field.removeClass('st-ok');
-    field.removeClass('st-incomplete');
-    field.removeClass('st-error');
+    field.removeClass('st-ok st-incomplete st-error st-case-error st-punctuation-error');
+}
+
+function stripPunctuation(str) {
+    return str.replace(/[\s\p{P}]/gu, '');
+}
+
+function classifyError(current, reference) {
+    if (current.toLowerCase() === reference.toLowerCase()) {
+        return 'st-case-error';
+    }
+    if (stripPunctuation(current) === stripPunctuation(reference)) {
+        return 'st-punctuation-error';
+    }
+    if (stripPunctuation(current).toLowerCase() === stripPunctuation(reference).toLowerCase()) {
+        return 'st-punctuation-error';
+    }
+    return 'st-error';
 }
 
 function suggestNextCharacter(field, current, reference, event) {

@@ -2,7 +2,7 @@ import pytest
 
 from src.handler import (
     FieldsContext, AnkiInterface, addon_field_filter, handle_answer,
-    _format_field_result, _calc_input_width, _clear_correct_value_as_reviewer,
+    _format_field_result, _classify_error, _calc_input_width, _clear_correct_value_as_reviewer,
 )
 from src.config import ConfigService, ConfigKey
 from tests.anki_mocks_test import TestReviewer, TestCard
@@ -183,7 +183,7 @@ def test_withRegexStr():
 
 def test_field_result_uppercase_error():
     result = _format_field_result('milano', 'Milano')
-    assert 'st-error' in str(result)
+    assert 'st-case-error' in str(result)
 
 
 def test_field_result_ignore_case():
@@ -285,6 +285,35 @@ def test_field_result_ignore_case_mismatch():
         assert 'wrong' in result
     finally:
         ConfigService.load_config = _orig
+
+
+# --------------------------------- _classify_error tests --------------------------------------------
+
+def test_classify_case_error():
+    assert _classify_error("hello", "Hello") == 'st-case-error'
+    assert _classify_error("WORLD", "world") == 'st-case-error'
+
+def test_classify_punctuation_error():
+    assert _classify_error("hello world", "hello, world") == 'st-punctuation-error'
+    assert _classify_error("test-value", "test value") == 'st-punctuation-error'
+    assert _classify_error("one two", "one  two") == 'st-punctuation-error'
+
+def test_classify_punctuation_and_case_error():
+    assert _classify_error("hello world", "Hello, World") == 'st-punctuation-error'
+
+def test_classify_real_error():
+    assert _classify_error("wrong", "right") == 'st-error'
+    assert _classify_error("abc", "xyz") == 'st-error'
+
+def test_field_result_case_error_in_answer():
+    result = str(_format_field_result("hello", "Hello"))
+    assert 'st-case-error' in result
+    assert 'st-expected' in result
+
+def test_field_result_punctuation_error_in_answer():
+    result = str(_format_field_result("hello world", "hello, world"))
+    assert 'st-punctuation-error' in result
+    assert 'st-expected' in result
 
 
 # --------------------------------- handle_answer edge cases ----------------------------------------
