@@ -2,7 +2,7 @@ import pytest
 
 from src.handler import (
     FieldsContext, AnkiInterface, addon_field_filter, handle_answer,
-    _format_field_result, _get_length_class, _clear_correct_value_as_reviewer,
+    _format_field_result, _calc_input_width, _clear_correct_value_as_reviewer,
 )
 from src.config import ConfigService, ConfigKey
 from tests.anki_mocks_test import TestReviewer, TestCard
@@ -212,22 +212,19 @@ an> <span class="cloze-inactive" data-ordinal="2">Sprache</span> After
     assert ('mit' in res)
 
 
-# --------------------------------- _get_length_class tests ------------------------------------------
+# --------------------------------- _calc_input_width tests ------------------------------------------
 
-def test_length_class_xs():
-    assert _get_length_class("hi", "") == "ftb-xs"
+def test_input_width_matches_text_length():
+    assert _calc_input_width("hello", "") == 6  # len + 1
 
-def test_length_class_sm():
-    assert _get_length_class("hello!", "") == "ftb-sm"
+def test_input_width_minimum():
+    assert _calc_input_width("a", "") == 3  # min is 3
 
-def test_length_class_md():
-    assert _get_length_class("medium length", "") == "ftb-md"
+def test_input_width_uses_hint_if_longer():
+    assert _calc_input_width("ab", "longer hint") == 12  # len("longer hint") + 1
 
-def test_length_class_lg():
-    assert _get_length_class("a very long answer indeed!", "") == "ftb-lg"
-
-def test_length_class_uses_hint_if_longer():
-    assert _get_length_class("ab", "a longer hint here") == "ftb-md"
+def test_input_width_long_text():
+    assert _calc_input_width("a very long answer", "") == 19
 
 
 # --------------------------------- _clear_correct_value tests ---------------------------------------

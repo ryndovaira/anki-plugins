@@ -90,8 +90,10 @@ def _clear_correct_value_as_reviewer(text_beautiful_soup: str):
 
 def _create_fill_elements(idx: int, text: str, hint: str = "") -> BeautifulSoup:
     hidden = BeautifulSoup("""<input type="hidden" id="ansval%d" value="%s" />""" % (idx, text), "html.parser")
-    typein = BeautifulSoup("""<input type="text" id="typeans%d" placeholder="%s" class="ftb %s" />""" %
-                           (idx, hint, _get_length_class(text, hint)), "html.parser")
+    width = _calc_input_width(text, hint)
+    typein = BeautifulSoup(
+        """<input type="text" id="typeans%d" placeholder="%s" class="ftb" style="width: %sch" />"""
+        % (idx, hint, width), "html.parser")
     script = BeautifulSoup(
         """<script type="text/javascript">setUpFillBlankListener($('#ansval%d').val(), %d)</script>""" % (idx, idx),
         'html.parser')
@@ -106,16 +108,9 @@ def _create_fill_elements(idx: int, text: str, hint: str = "") -> BeautifulSoup:
     return container
 
 
-def _get_length_class(text: str, hint: str):
-    hint_present = hint if hint else ""
-    size = max(len(text), len(hint_present))
-    if size <= 5:
-        return "ftb-xs"
-    elif size <= 10:
-        return "ftb-sm"
-    elif size > 20:
-        return "ftb-lg"
-    return "ftb-md"
+def _calc_input_width(text: str, hint: str) -> int:
+    size = max(len(text), len(hint)) if hint else len(text)
+    return max(size + 1, 3)
 
 
 def on_show_question():

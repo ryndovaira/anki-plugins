@@ -23,13 +23,10 @@ CSS_STYLE = """
 input.ftb {
     border-radius: 5px;
     border: 1px solid #999;
-    min-width: 50px;
-    max-width: 400px;
+    min-width: 3ch;
+    max-width: 80ch;
     padding: 3px;
     margin: 2px;
-}
-input.ftb-md {
-    width: 150px;
 }
 input.st-incomplete {
     background-color: #FFFF77;
