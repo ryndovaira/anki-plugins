@@ -1,10 +1,8 @@
 import pytest
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src')
 
-from handler import FieldsContext, AnkiInterface, addon_field_filter, handle_answer, _format_field_result
-from anki_mocks_test import TestReviewer, TestCard
+from src.handler import FieldsContext, AnkiInterface, addon_field_filter, handle_answer, _format_field_result
+from src.config import ConfigService, ConfigKey
+from tests.anki_mocks_test import TestReviewer, TestCard
 
 AnkiInterface.strip_HTML = lambda i: i
 
@@ -186,10 +184,15 @@ def test_field_result_uppercase_error():
 
 
 def test_field_result_ignore_case():
-    FieldsContext.ignore_case = True
-    result = _format_field_result('milano', 'Milano')
-    assert 'st-error' not in str(result)
-    assert 'st-ok' in str(result)
+    _orig = ConfigService.load_config
+    ConfigService.load_config = lambda key: True if key == ConfigKey.IGNORE_CASE else _orig(key)
+    try:
+        result = _format_field_result('milano', 'Milano')
+        assert 'st-error' not in str(result)
+        assert 'st-ok' in str(result)
+        assert 'Milano' in str(result)
+    finally:
+        ConfigService.load_config = _orig
 
 
 def test_multiple_with_hint():

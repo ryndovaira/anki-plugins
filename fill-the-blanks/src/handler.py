@@ -169,10 +169,8 @@ def _format_field_result(given: str, expected: str) -> BeautifulSoup:
     given = given.strip()
     expected = expected.strip()
     ignore_case = ConfigService.read(ConfigKey.IGNORE_CASE, bool)
-    if ignore_case:
-        given = given.lower()
-        expected = expected.lower()
-    if given == expected:
+    matches = given.lower() == expected.lower() if ignore_case else given == expected
+    if matches:
         return BeautifulSoup("<span class='cloze st-ok'>%s</span>" % html.escape(expected), "html.parser")
     return BeautifulSoup("<del class='cloze st-error'>%s</del><ins class='cloze st-expected'>%s</ins>" %
                          (html.escape(given), html.escape(expected)),

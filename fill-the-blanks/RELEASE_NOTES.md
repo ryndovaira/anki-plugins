@@ -108,3 +108,10 @@
 *25.3-2* | 08/03/2025
 
 * Fix shortcut for "show next character" on MacOS
+
+*25.3-3* | 19/03/2026
+
+* Fix "ignore case" not applied on answer feedback (Python side was ignoring the setting)
+* Preserve original case in displayed answer when ignore_case is enabled
+* Add pyproject.toml, use uv for dependency management
+* Fix tests: proper package imports instead of sys.path hack
