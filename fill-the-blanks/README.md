@@ -40,16 +40,14 @@ This addon solves this issue.
 
 ### Instant feedback
 
-While the user types in the answer, the corresponding input field changes.  
-The background color changes according to the value:  
+While the user types in the answer, the corresponding input field changes.
+The background color changes according to the value:
 
 * incomplete: yellow
 * correct: green
+* case error (e.g. "hello" vs "Hello"): blue
+* punctuation/spacing error (e.g. "hello world" vs "hello, world"): orange
 * incorrect: red
-
-![Feedback](doc/intant-feedback.gif)
-
-> Note from dev: In my own tests, this is really good. It makes me try harder to get the right answer.
 
 
 **Configurations:**  
