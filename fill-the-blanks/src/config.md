@@ -1,20 +1,21 @@
-# Fill the Blanks
+# Fill the Blanks — Configuration
 
 * feedback-enabled:
     * Indicates whether *Instant Feedback* should be enabled
     * Acceptable values: true | false
+    * Default: true
 
 * feedback-ignore-case:
-    * When feedback is enabled, it indicates whether to be case sensitive (default) or not
+    * When feedback is enabled, it indicates whether to ignore case (upper/lower) or not
     * Acceptable values: true | false
-    
-* feedback-ignore-accents:
-    * When feedback is enabled, it indicates whether accents/umlauts (default)  shall be ignore or not
-    * Acceptable values: true | false
-     
-* experimental-asian-chars:
-    * In test, for enabling feedback for Japanese, Chinese, Korean
-    * Acceptable values: true | false
+    * Default: true
 
-New integration is the default now:  
-https://github.com/ssricardo/anki-plugins/wiki/Fill-the-blanks-Default-Integration
+* feedback-ignore-accents:
+    * When feedback is enabled, it indicates whether accents/umlauts shall be ignored or not (e.g. č vs c, ü vs u)
+    * Acceptable values: true | false
+    * Default: false
+
+* experimental-asian-chars:
+    * Experimental support for feedback with Japanese, Chinese, Korean input
+    * Acceptable values: true | false
+    * Default: false

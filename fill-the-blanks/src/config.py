@@ -1,30 +1,14 @@
-# -*- coding: utf-8 -*-
-# Handles Configuration reading, saving and the integration with the config UI
-# Contains model, service and view controller for Config
+# Handles Configuration reading and the integration with Anki's config system
 #
-# This files is part of fill-the-blanks addon
+# This file is part of fill-the-blanks addon
 # @author ricardo saturnino
-# -------------------------------------------------------
-
-# from .core import Feedback
-
-import os
-
-currentLocation = os.path.dirname(os.path.realpath(__file__))
-
-
-# ---------------------------------- Model ------------------------------
 
 
 class ConfigKey:
-    FEEDBACK_ENABLED = "feedback-enabled"
-    IGNORE_CASE = "feedback-ignore-case"
-    IGNORE_ACCENTS = "feedback-ignore-accents"
-    ASIAN_CHARS = "experimental-asian-chars"
-    LEN_MULTIPLIER = "input-len-times"
-
-
-# ------------------------------ Service class --------------------------
+    FEEDBACK_ENABLED = 'feedback-enabled'
+    IGNORE_CASE = 'feedback-ignore-case'
+    IGNORE_ACCENTS = 'feedback-ignore-accents'
+    ASIAN_CHARS = 'experimental-asian-chars'
 
 
 DEFAULT_CONFIG = {
@@ -32,27 +16,23 @@ DEFAULT_CONFIG = {
     ConfigKey.IGNORE_CASE: True,
     ConfigKey.IGNORE_ACCENTS: False,
     ConfigKey.ASIAN_CHARS: False,
-    ConfigKey.LEN_MULTIPLIER: 62,
 }
 
 
 class ConfigService:
-    """
-    Responsible for reading and storing configurations
-    """
+    """Responsible for reading and storing configurations."""
 
     @staticmethod
     def load_config(key):
         raise NotImplementedError()
 
     @classmethod
-    def read(clz, key: str, expectedType):
+    def read(cls, key: str, expected_type: type):
         try:
-            value = clz.load_config(key)
-            if not (type(value) == expectedType):
-                raise TypeError()
-        except Exception as e:
-            # print(e)
+            value = cls.load_config(key)
+            if not isinstance(value, expected_type):
+                value = None
+        except Exception:
             value = None
 
-        return value if (value is not None) else DEFAULT_CONFIG[key]
+        return value if value is not None else DEFAULT_CONFIG[key]

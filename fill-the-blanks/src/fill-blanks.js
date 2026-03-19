@@ -2,10 +2,10 @@ let ifEnabled = true;
 let shouldIgnoreCase = false;
 let shouldIgnoreAccents = false;
 let asianCharsEnabled = false;
-var typedWords = [];
+let typedWords = [];
 
 function checkFieldValue(reference, fieldIndex, event) {
-    if (window.event.keyCode === 13) {
+    if (event.key === 'Enter') {
         pycmd("ans");
         return;
     }
@@ -17,7 +17,6 @@ function checkFieldValue(reference, fieldIndex, event) {
     }
 
     let current = field.val();
-    // console.log('Cur: ' + current + '; starts? ' + reference.startsWith(current));
     let previous = field.data('lastValue');
 
     if (suggestNextCharacter(field, current, reference, event)) {
@@ -49,10 +48,10 @@ function checkFieldValue(reference, fieldIndex, event) {
     if (current == reference) {
         field.addClass('st-ok');
     } else {
-        if (reference.startsWith(current)) {            
+        if (reference.startsWith(current)) {
             field.addClass('st-incomplete');
         } else {
-            field.addClass('st-error');
+            field.addClass(classifyError(current, reference));
         }
     }
     field.data('lastValue', current);
@@ -60,9 +59,24 @@ function checkFieldValue(reference, fieldIndex, event) {
 }
 
 function cleanUpView(field) {
-    field.removeClass('st-ok');
-    field.removeClass('st-incomplete');
-    field.removeClass('st-error');
+    field.removeClass('st-ok st-incomplete st-error st-case-error st-punctuation-error');
+}
+
+function stripPunctuation(str) {
+    return str.replace(/[\s\p{P}]/gu, '');
+}
+
+function classifyError(current, reference) {
+    if (current.toLowerCase() === reference.toLowerCase()) {
+        return 'st-case-error';
+    }
+    if (stripPunctuation(current) === stripPunctuation(reference)) {
+        return 'st-punctuation-error';
+    }
+    if (stripPunctuation(current).toLowerCase() === stripPunctuation(reference).toLowerCase()) {
+        return 'st-punctuation-error';
+    }
+    return 'st-error';
 }
 
 function suggestNextCharacter(field, current, reference, event) {
@@ -137,7 +151,7 @@ function setUpFillBlankListener(expected, typeAnsIndex) {
     // add extra event for Enter key
     if (eventType === "input") {
         document.getElementById(`typeans${typeAnsIndex}`).addEventListener("keyup", (evt) => {
-            if (window.event.keyCode === 13) {
+            if (event.key === 'Enter') {
                 pycmd("ans");
             }
         })

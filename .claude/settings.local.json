@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(export PATH=\"/c/Program Files/GitHub CLI:$PATH\")",
+      "Bash(gh repo:*)",
+      "Bash(.venv/Scripts/python -m pytest fill-the-blanks/tests/handler_test.py -v 2>&1)",
+      "Bash(ls .venv/Scripts/python*)",
+      "Bash(py:*)",
+      "Bash(git stash:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git rm:*)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(cmd.exe /c \"mklink /J \\\\\"C:\\\\Users\\\\ryndo\\\\AppData\\\\Roaming\\\\Anki2\\\\addons21\\\\fill_the_blanks\\\\\" \\\\\"C:\\\\Users\\\\ryndo\\\\Code\\\\anki-plugins\\\\fill-the-blanks\\\\src\\\\\"\" 2>&1)",
+      "Bash(powershell.exe -Command \"New-Item -ItemType Junction -Path 'C:\\\\Users\\\\ryndo\\\\AppData\\\\Roaming\\\\Anki2\\\\addons21\\\\fill_the_blanks' -Target 'C:\\\\Users\\\\ryndo\\\\Code\\\\anki-plugins\\\\fill-the-blanks\\\\src'\" 2>&1)",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\Users\\\\ryndo\\\\AppData\\\\Roaming\\\\Anki2\\\\addons21\\\\1933645497'\" 2>&1)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
+    ]
+  }
+}

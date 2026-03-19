@@ -1,0 +1,11 @@
+[project]
+name = "fill-the-blanks"
+version = "25.3.3"
+requires-python = ">=3.10"
+dependencies = ["beautifulsoup4"]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

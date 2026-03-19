@@ -108,3 +108,14 @@
 *25.3-2* | 08/03/2025
 
 * Fix shortcut for "show next character" on MacOS
+
+*25.3-3* | 20/03/2026
+
+* Fix "ignore case" not applied on answer feedback (Python side was ignoring the setting)
+* Preserve original case in displayed answer when ignore_case is enabled
+* Smart error classification: case errors (blue), punctuation errors (orange), content errors (red)
+* Dynamic input field width based on expected answer length (ch units)
+* Change default: ignore_case now true by default
+* Add pyproject.toml, use uv for dependency management
+* Refactor: fix file handle leak, remove dead code, update deprecated JS APIs
+* Fix tests: proper package imports, add tests for config, error classification, edge cases
