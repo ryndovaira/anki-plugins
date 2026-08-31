@@ -29,3 +29,6 @@ Thumbs.db
 # Archives / build artifacts
 *.zip
 *.ankiaddon
+
+# Anki writes per-user addon config here when src/ is linked into addons21
+fill-the-blanks/src/meta.json

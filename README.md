@@ -1,8 +1,8 @@
 # Fill the Blanks — Anki Plugin
 
-Improved `type:cloze` handling for [Anki](https://apps.ankiweb.net/).
+Type-in-the-answer cloze cards for [Anki](https://apps.ankiweb.net/).
 
-This plugin makes Anki handle cards of the kind `type:cloze` properly and adds support for multiple cloze parts on those cards.
+Adds a `fill-blanks:` template filter: write `{{fill-blanks:cloze:Field}}` on the front and each cloze part becomes its own input field.
 
 Originally developed by [ssricardo](https://github.com/ssricardo/anki-plugins). This fork is maintained by [ryndovaira](https://github.com/ryndovaira).
 

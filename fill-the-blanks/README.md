@@ -1,7 +1,7 @@
-# Fill the blanks - Improved type:cloze
+# Fill the blanks - Type in your cloze answers
 
 > *TLDR;*  
-> This addons makes Anki handle cards of the kind *type:cloze* properly and adds support for multiple cloze parts on those cards
+> This addon lets you type in the answers on cloze cards, with one input field per cloze part
 
 With the addon applied:  
 
@@ -12,9 +12,10 @@ With the addon applied:
 Typing in the answers are interesting for studying. For many people, writing is more efficient for memorization than just reading.  
 On cloze cards, when hiding just the cloze parts, it's possible to study contents within a context.  
 
-The current version of Anki doesn't work well with that combination (On cloze card, it replaces the entire content with a single *input text*).  
+Anki's built-in `{{type:cloze:...}}` doesn't work well with that combination: on a cloze card it replaces the entire
+content with a single *input text*.  
 
-This addon solves this issue.  
+This addon solves this issue with its own template filter, `fill-blanks:`.  
 
 > Note from dev: At first, I'm using it for source code blocks. Soon, I think about using for cards with language (ex: German) phrases as well
 
@@ -24,17 +25,17 @@ This addon solves this issue.
 
 ![Card editor with cloze](doc/cloze-card.png)
 
-* On the note templates editor, instead of using *cloze:fieldName*, use *type:cloze:[fieldName]* 
-
-> Example with a field named "Texto"
+* On the note templates editor, use `{{fill-blanks:cloze:fieldName}}` on the front. Leave the back as `{{cloze:fieldName}}`
 
 ![The card template editor](doc/card-template.png)
+
+> Screenshot is outdated: it shows the old `type:cloze:` syntax, removed in *25.3-1*.
 
 * Then, on review time, the cloze parts will be replaced with *input texts*
 
 ![Modifying to use the addon](doc/from-cloze-to-input.gif)
 
-> Note: this addon does not create a new note type. You need to either edit or duplicate an existing. Look up "type:cloze" on Anki's manual. 
+> Note: this addon does not create a new note type. You need to either edit or duplicate an existing Cloze note type.
 
 ## Extra feature
 
